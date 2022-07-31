@@ -29,7 +29,7 @@ class TaskPagesTests(TestCase):
             text='Тестовый текст',
             pub_date='14.07.2022',
         )
-        # авторизируем пользователя
+        # авторизуем пользователя
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
 
@@ -37,10 +37,13 @@ class TaskPagesTests(TestCase):
         """URL-адрес использует соответствующий шаблон."""
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
-            reverse('posts:post_create'): 'posts/create_post.html',
+            (reverse(
+                'posts:post_create'
+            )): 'posts/create_post.html',
             (reverse(
                 'posts:group_list',
-                kwargs={'slug': f'{self.post.group.slug}'
+                kwargs={
+                    'slug': f'{self.post.group.slug}'
                         })): 'posts/group_list.html',
             (reverse(
                 'posts:post_detail',
@@ -62,17 +65,22 @@ class TaskPagesTests(TestCase):
 
     def test_not_found(self):
         """Запрос к несуществующей странице вернет ошибку"""
-        response = self.authorized_client.get('/unexciting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        response = self.authorized_client.get(
+            '/unexciting_page/')
+        self.assertEqual(
+            response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_index_page_show_correct_context(self):
-        """Шаблон index сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('posts:index'))
+        """Шаблон index сформирован"""
+        """с правильным контекстом."""
+        response = (self.authorized_client.get(
+            reverse('posts:index')))
         post = response.context['page_obj'][0].text
         self.assertEqual(post, 'Тестовый текст')
 
     def test_group_list_page_show_correct_context(self):
-        """Шаблон group_list сформирован с правильным контекстом."""
+        """Шаблон group_list сформирован"""
+        """с правильным контекстом."""
         response = (self.authorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug': 'test_slug'})))
@@ -81,7 +89,8 @@ class TaskPagesTests(TestCase):
         self.assertEqual(group, 'Тестовая группа')
 
     def test_user_list_page_show_correct_context(self):
-        """Шаблон profile сформирован с правильным контекстом."""
+        """Шаблон profile сформирован"""
+        """с правильным контекстом."""
         response = (self.authorized_client.get(
             reverse('posts:profile',
                     kwargs={'username': 'myuser'})))
@@ -89,7 +98,8 @@ class TaskPagesTests(TestCase):
         self.assertEqual(user, self.user)
 
     def test_post_detail_list_page_show_correct_context(self):
-        """Шаблон post_detail сформирован с правильным контекстом."""
+        """Шаблон post_detail сформирован"""
+        """с правильным контекстом."""
         response = (self.authorized_client.get(
             reverse('posts:post_detail',
                     kwargs={'post_id': '1'})))
@@ -97,7 +107,8 @@ class TaskPagesTests(TestCase):
         self.assertEqual(post_detail, 'Тестовый текст')
 
     def test_post_create_list_page_show_correct_context(self):
-        """Шаблон post_create сформирован с правильным контекстом."""
+        """Шаблон post_create сформирован"""
+        """с правильным контекстом."""
         response = (self.authorized_client.get(
             reverse('posts:post_create')))
         form_fields = {
@@ -107,11 +118,14 @@ class TaskPagesTests(TestCase):
 
         for value, expected in form_fields.items():
             with self.subTest(value=value):
-                form_field = response.context.get('form').fields.get(value)
+                form_field = (
+                    response.context.get('form').fields.get(
+                        value))
                 self.assertIsInstance(form_field, expected)
 
     def test_post_edit_list_page_show_correct_context(self):
-        """Шаблон post_edit сформирован с правильным контекстом."""
+        """Шаблон post_edit сформирован"""
+        """с правильным контекстом."""
         response = (self.authorized_client.get(
             reverse('posts:post_edit',
                     kwargs={'post_id': '1'})))
@@ -122,12 +136,14 @@ class TaskPagesTests(TestCase):
 
         for value, expected in form_fields.items():
             with self.subTest(value=value):
-                form_field = response.context.get('form').fields.get(value)
+                form_field = (
+                    response.context.get('form').fields.get(value))
                 self.assertIsInstance(form_field, expected)
 
     def test_post_with_group_index_show_correct_context(self):
         """Пост с группой есть на главной странице."""
-        response = self.authorized_client.get(reverse('posts:index'))
+        response = (
+            self.authorized_client.get(reverse('posts:index')))
         post = response.context['page_obj'][0]
         post_text = post.text
         post_group = post.group.title
@@ -188,38 +204,39 @@ class PaginatorTests(TestCase):
         cls.authorized_client.force_login(cls.user)
 
     def test_first_page_index(self):
-        """index - На первой странице должно быть 10 постов"""
+        """Index - На первой странице должно быть 10 постов"""
         response = self.authorized_client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_page_index(self):
-        """index - На второй странице должно быть 3 поста"""
-        response = self.authorized_client.get(reverse('posts:index') + '?page=2')
+        """Index - На второй странице должно быть 3 поста"""
+        response = (self.authorized_client.get(
+            reverse('posts:index') + '?page=2'))
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_first_group_list(self):
-        """group_list - На первой странице должно быть 10 постов"""
+        """Group_list - На первой странице должно быть 10 постов"""
         response = (self.authorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug': 'test_slug'})))
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_group_list(self):
-        """group_list - На второй странице должно быть 3 поста"""
+        """Group_list - На второй странице должно быть 3 поста"""
         response = (self.authorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug': 'test_slug'}) + '?page=2'))
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_first_profile(self):
-        """profile - На первой странице должно быть 10 постов"""
+        """Profile - На первой странице должно быть 10 постов"""
         response = (self.authorized_client.get(
             reverse('posts:profile',
                     kwargs={'username': 'myuser'})))
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_profile(self):
-        """profile - На второй странице должно быть 3 поста"""
+        """Profile - На второй странице должно быть 3 поста"""
         response = (self.authorized_client.get(
             reverse('posts:profile',
                     kwargs={'username': 'myuser'}) + '?page=2'))
