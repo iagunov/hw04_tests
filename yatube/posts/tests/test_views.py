@@ -42,21 +42,20 @@ class TaskPagesTests(TestCase):
             )): 'posts/create_post.html',
             (reverse(
                 'posts:group_list',
-                kwargs={
-                    'slug': f'{self.post.group.slug}'
-                        })): 'posts/group_list.html',
+                kwargs={'slug': f'{self.post.group.slug}'}
+            )): 'posts/group_list.html',
             (reverse(
                 'posts:post_detail',
-                kwargs={'post_id': f'{self.post.pk}'
-                        })): 'posts/post_detail.html',
+                kwargs={'post_id': f'{self.post.pk}'}
+            )): 'posts/post_detail.html',
             (reverse(
                 'posts:post_edit',
-                kwargs={'post_id': f'{self.post.pk}'
-                        })): 'posts/create_post.html',
+                kwargs={'post_id': f'{self.post.pk}'}
+            )): 'posts/create_post.html',
             (reverse(
                 'posts:profile',
-                kwargs={'username': f'{self.post.author}'
-                        })): 'posts/profile.html',
+                kwargs={'username': f'{self.post.author}'}
+            )): 'posts/profile.html',
         }
         for reverse_name, template in templates_pages_names.items():
             with self.subTest(template=template):
