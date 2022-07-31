@@ -76,7 +76,8 @@ class TaskPagesTests(TestCase):
         response = (self.authorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug': 'test_slug'})))
-        group = response.context['page_obj'][0].group.title
+        group = (response.context
+                 ['page_obj'][0].group.title)
         self.assertEqual(group, 'Тестовая группа')
 
     def test_user_list_page_show_correct_context(self):
