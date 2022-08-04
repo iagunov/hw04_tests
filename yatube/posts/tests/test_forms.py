@@ -57,6 +57,8 @@ class TaskURLTests(TestCase):
         # получить пост получает 302 redirect
         response_guest = self.guest.get(update_url)
         self.assertEqual(response_guest.status_code, HTTPStatus.FOUND)
+        # количество постов осталось прежним 1
+        self.assertEqual(Post.objects.count(), 1)
 
         # авторизированный пользователь получает страницу
         # и через форму пушит новый текст
@@ -86,11 +88,7 @@ class TaskURLTests(TestCase):
                 group=self.group_2,
             ).exists()
         )
-        # в старом списке поста не осталось,
-        # если вы подскажете как проверить
-        # не существование более элегантно
-        # чем len(.exist не подходит)
-        # буду благодарен
+        # в старом списке поста не осталось
         get_group_list = reverse(
             'posts:group_list',
             kwargs={'slug': 'test_slug'})
@@ -99,42 +97,6 @@ class TaskURLTests(TestCase):
         group = (response.context
                  ['page_obj'])
         self.assertEqual(len(group), 0)
-    # эти тесты из другого спринта не пускает автопроверка
-    # поэтому я их закомментировал
-    # def test_img_context_index(self):
-    #     # осталось решить проблему с удалением, остальное работает
-    #     """Шаблон index сформирован с картинкой."""
-    #     response = (self.authorized_client.get(
-    #         reverse('posts:index')))
-    #     post = response.context['page_obj'][0].image.name
-    #     self.assertEqual(post, 'Тестовый index')
-    #
-    # def test_img_context_profile(self):
-    #     # осталось решить проблему с удалением, остальное работает
-    #     """Шаблон profile сформирован с картинкой."""
-    #     response = (self.authorized_client.get(
-    #         reverse('posts:profile',
-    #                 kwargs={'username': 'author'})))
-    #     post = response.context['page_obj'][0].image.name
-    #     self.assertEqual(post, 'Тестовый profile')
-    #
-    # def test_img_context_group(self):
-    #     # осталось решить проблему с удалением, остальное работает
-    #     """Шаблон group сформирован с картинкой."""
-    #     response = (self.authorized_client.get(
-    #         reverse('posts:group_list',
-    #                 kwargs={'slug': 'test_slug'})))
-    #     post = response.context['page_obj'][0].image.name
-    #     self.assertEqual(post, 'Тестовый group')
-    #
-    # def test_img_context_detail(self):
-    #     # осталось решить проблему с удалением, остальное работает
-    #     """Шаблон detail сформирован с картинкой."""
-    #     response = (self.authorized_client.get(
-    #         reverse('posts:post_detail',
-    #                 kwargs={'post_id': '1'})))
-    #     post = response.context['post'].image.name
-    #     self.assertEqual(post, 'Тестовый detail')
 
     def test_create_post(self):
         """Валидная форма создает запись в Posts."""
